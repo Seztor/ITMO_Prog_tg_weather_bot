@@ -1,5 +1,5 @@
 import unittest
-from src.lab1.tg_main import *
+from src.lab0.tg_main import *
 
 class CalculatorTestCase(unittest.TestCase):
 
