@@ -1,5 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-
+from urllib3 import request
 
 main = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Прогноз погоды', callback_data='call_but1_weather')],
@@ -17,9 +17,10 @@ back_but_to_0_plus_settings = InlineKeyboardMarkup(inline_keyboard=[[InlineKeybo
                                                                     [but_to_0]])
 
 but_location = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='', callback_data='call_but1')],
-    [InlineKeyboardButton(text='But2', callback_data='call_but2')],
-    [InlineKeyboardButton(text='But3', callback_data='call_but3')]])
+    [InlineKeyboardButton(text='Ввести город', callback_data='call_but1')],
+    [InlineKeyboardButton(text='Ввести координаты', callback_data='call_but_type')],
+    [InlineKeyboardButton(text='Отправить геопозицию', callback_data='call_geo_send', request_location=True)],
+    [but_to_0]])
 
 
 

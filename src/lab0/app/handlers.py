@@ -71,14 +71,14 @@ async def main_menu(message: Message):
 
 @handler_router.callback_query(F.data == 'call_but1_weather')
 async def call_but2(callback: CallbackQuery):
-    await callback.answer('')
-    await callback.message.answer('weather')
+    photo_location = InputMediaPhoto(media=photo_main,caption='Выберите:')
+    await callback.message.edit_media(photo_location, reply_markup=kb.but_location)
 
 
 #about 3 menu (О боте)
 @handler_router.callback_query(F.data == 'call_but2_about')
 async def call_but3(callback: CallbackQuery):
-    photo_about_inp = InputMediaPhoto(media=FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/about.jpg'),
+    photo_about_inp = InputMediaPhoto(media=photo_about,
                                       caption='Weather bot\n'
                                               'Creared by @Seztor\n'
                                               'Pavel Govorov')
@@ -97,7 +97,7 @@ convert_temp_to_rus = {
 @handler_router.callback_query(F.data == 'call_but3_settings')
 async def call_but4(callback: CallbackQuery):
     temptype = get_users_data(callback.from_user.id)['temptype']
-    photo_temp_inp = InputMediaPhoto(media=FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/temperature.png'),
+    photo_temp_inp = InputMediaPhoto(media=photo_temp,
                                      caption=f'🌡️ Выберите в чем измерять температуру:'
                                              f'\nСейчас температурная шкала: {convert_temp_to_rus[temptype]}')
 
@@ -108,12 +108,12 @@ async def call_but4(callback: CallbackQuery):
 async def call_but5(callback: CallbackQuery):
     data = str(callback.data.split('_')[-1])
     temptype = get_users_data(callback.from_user.id)['temptype']
-    #await callback.answer(f'Вы выбрали шкалу "{convert_temp_to_rus[data]}"')
+    await callback.answer(f'Вы выбрали шкалу "{convert_temp_to_rus[data].strip()}"')
     if temptype != data:
         update_user_data(data, callback.from_user.id, 'temptype')
     try:
         photo_temp_inp = InputMediaPhoto(
-            media=FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/temperature.png'),
+            media=photo_temp,
             caption=f'🌡️ Выберите в чем измерять температуру:'
                     f'\nСейчас температурная шкала: {convert_temp_to_rus[data]}')
         await callback.message.edit_media(photo_temp_inp, reply_markup=kb.back_but_to_0_plus_settings)
