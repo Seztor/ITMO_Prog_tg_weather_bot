@@ -8,7 +8,6 @@ from src.lab0.app.handlers import handler_router
 async def main():
     bot = Bot(token="8197013227:AAGGdLartz7O5E1cUFgHmUgPvA5UVU4jk3Y")
     dp = Dispatcher()
-
     dp.include_router(handler_router)
     print('bot started')
     try:

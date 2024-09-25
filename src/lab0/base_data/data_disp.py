@@ -45,4 +45,3 @@ def check_user_data(id, name):
     except:
         update_user_data(default_data, id)
 
-
