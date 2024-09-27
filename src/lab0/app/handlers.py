@@ -7,7 +7,8 @@ from aiogram.fsm.context import FSMContext
 from src.lab0.base_data.data_disp import update_user_data, get_users_data, check_user_data
 import src.lab0.app.keyboards as kb
 from src.lab0.weather_data_api.weather_data_visualer import get_visual_data_current_weather
-from src.lab0.weather_data_api.weather_disp import get_city_by_coords, get_current_weather_by_cords, get_cords_by_city
+from src.lab0.weather_data_api.weather_disp import (get_city_by_coords, get_current_weather_by_cords, get_cords_by_city,
+                                                    get_orig_city_name)
 
 # from annotated_types.test_cases import cases
 
@@ -35,8 +36,9 @@ class Weather(StatesGroup):
 async def main_menu(message: Message, state: FSMContext):
     await state.clear()
     check_user_data(message.from_user.id, message.from_user.first_name)
-    await message.answer_photo(photo_main ,caption=f'🌏 Hello {message.from_user.first_name}, this is a weather forecast bot!\n📝 Select menu item:',
-                         reply_markup=kb.main)
+    await message.answer_photo(photo_main ,caption=f'🌏 Hello {message.from_user.first_name},'
+                                                   f' this is a weather forecast bot!\n📝 Select menu item:',
+                               reply_markup=kb.main)
 
 
 @handler_router.callback_query(F.data == 'call_back_to_0')
@@ -44,7 +46,8 @@ async def main_menu(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     check_user_data(callback.from_user.id, callback.from_user.first_name)
     photo_main_inp = InputMediaPhoto(media=photo_main,
-                                     caption=f'🌏 Hello {callback.from_user.first_name}, this is a weather forecast bot!\n📝 Select menu item:')
+                                     caption=f'🌏 Hello {callback.from_user.first_name},'
+                                             f' this is a weather forecast bot!\n📝 Select menu item:')
     await callback.message.edit_media(photo_main_inp, reply_markup=kb.main)
 
 
@@ -69,15 +72,20 @@ async def weather_forecast(callback: CallbackQuery, state: FSMContext):
 async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
-        forecast_data_dict = get_current_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'), get_users_data(callback.from_user.id)['temptype'])
+        forecast_data_dict = get_current_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
+                                                          get_users_data(callback.from_user.id)['temptype'])
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
 
         str_forecast_output = get_visual_data_current_weather(forecast_data_dict)
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
-                                         caption=f'Forecast in "{get_users_data(callback.from_user.id)['location']}" for today:\n{str_forecast_output}')
+                                         caption=f'Forecast in "{get_users_data(callback.from_user.id)['location']}" '
+                                                 f'for today:\n{str_forecast_output}')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
-        print('Error')
+        await callback.answer("Coordinates is not defined")
+
+
+
 
 #установка роли
 @handler_router.message(Command('setrole'))
@@ -142,11 +150,15 @@ async def type_city(message: Message, state: FSMContext):
     data = await state.get_data()
 
     cords = get_cords_by_city(data['city_name'])
-    if cords == 'Error city':
+    orig_name = get_orig_city_name(data['city_name'])
+    if cords == 'Error cords':
         update_user_data('Error city', message.from_user.id, 'location')
         update_user_data('Error cords', message.from_user.id, 'cords')
     else:
-        update_user_data(data['city_name'], message.from_user.id, 'location')
+        if orig_name != 'Error city':
+            update_user_data(orig_name, message.from_user.id, 'location')
+        else:
+            update_user_data(data['city_name'], message.from_user.id, 'location')
         update_user_data(cords, message.from_user.id, 'cords')
     await message.delete()
 

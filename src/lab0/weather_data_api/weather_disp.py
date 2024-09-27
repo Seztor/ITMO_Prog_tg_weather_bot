@@ -20,16 +20,22 @@ def get_city_by_coords(lat: str, lon: str):
     except:
         return 'Error city'
 
+def get_orig_city_name(city_name: str):
+    url = f'{BASE_URL_CITY}appid={TOKEN}&q={city_name}'
+    response = requests.get(url).json()
+    try:
+        return response[0]['name']
+    except:
+        return 'Error city'
 
 def get_cords_by_city(city_name: str):
     url = f'{BASE_URL_CITY}appid={TOKEN}&q={city_name}'
     response = requests.get(url).json()
-    # print(response)
     try:
         cords = f'{round(response[0]['lat'],5)}:{round(response[0]['lon'],5)}'
         return cords
     except:
-        return 'Error city'
+        return 'Error cords'
 
 convert_temp_url = {
     'cels': 'metric',
