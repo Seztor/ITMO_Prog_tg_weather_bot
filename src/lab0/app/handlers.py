@@ -51,9 +51,10 @@ async def main_menu(callback: CallbackQuery, state: FSMContext):
 
 
 #Прогноз погоды
-@handler_router.callback_query(F.data == 'call_but_weather')
+@handler_router.callback_query(F.data.in_(['call_but_weather','call_back_to_forecast']))
 async def weather_forecast(callback: CallbackQuery, state: FSMContext):
     await state.clear()
+    check_user_data(callback.from_user.id, callback.from_user.first_name)
     if get_users_data(callback.from_user.id)['location'] != 'None':
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
                                          caption=f'Select weather forecast date::')
@@ -68,19 +69,13 @@ async def weather_forecast(callback: CallbackQuery, state: FSMContext):
 async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
-        forecast_data_dict = get_current_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'))
+        forecast_data_dict = get_current_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'), get_users_data(callback.from_user.id)['temptype'])
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
-        get_visual_data_current_weather(forecast_data_dict, get_users_data(callback.from_user.id)['temptype'])
-        str_forecast_output = ''
-        # for i in forecast_data_dict:
-        #     try:
-        #         print(forecast_data_dict[i])
-        #         str_forecast_output += f'{forecast_data_dict[i]}\n'
-        #     except:
-        #         print(forecast_data_dict[i])
+
+        str_forecast_output = get_visual_data_current_weather(forecast_data_dict)
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
-                                         caption=f'Forecast for today:\n{str_forecast_output}')
-        await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_0)
+                                         caption=f'Forecast in "{get_users_data(callback.from_user.id)['location']}" for today:\n{str_forecast_output}')
+        await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
         print('Error')
 
@@ -111,6 +106,7 @@ async def role_man(message: Message):
 #weather 1 menu (Выбрать локацию)
 @handler_router.callback_query(F.data.in_(['call_but1_location','call_back_to_1']))
 async def call_but2(callback: CallbackQuery, state: FSMContext):
+    check_user_data(callback.from_user.id, callback.from_user.first_name)
     await state.clear()
     current_location = get_users_data(callback.from_user.id)['location']
     current_cords = get_users_data(callback.from_user.id)['cords']
@@ -134,6 +130,7 @@ async def call_but2(callback: CallbackQuery, state: FSMContext):
 @handler_router.callback_query(F.data == 'call_type_city')
 async def call_type_city(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Weather.state_get_city)
+    check_user_data(callback.from_user.id, callback.from_user.first_name)
     photo_city_inp = InputMediaPhoto(media=photo_city, caption=f'Enter the name of the locality\n'
                                                                f'point, and then go back:')
     await callback.message.edit_media(photo_city_inp, reply_markup=kb.back_but_to_1)
@@ -160,6 +157,7 @@ async def type_city(message: Message, state: FSMContext):
 @handler_router.callback_query(F.data == 'call_but_type_cords')
 async def call_type_cords(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Weather.state_cords_pos)
+    check_user_data(callback.from_user.id, callback.from_user.first_name)
     photo_cords_inp = InputMediaPhoto(media=photo_cords, caption=f'Enter coordinates in "latitude:longitude"\n'
                                                                  f'format or submit a geolocation\n'
                                                                  f'and then return back')
@@ -199,6 +197,7 @@ async def type_cords(message: Message, state: FSMContext):
 #about 3 menu (О боте)
 @handler_router.callback_query(F.data == 'call_but2_about')
 async def call_but3(callback: CallbackQuery, state: FSMContext):
+    check_user_data(callback.from_user.id, callback.from_user.first_name)
     await state.clear()
     photo_about_inp = InputMediaPhoto(media=photo_about,
                                       caption='Weather bot\n'
@@ -218,6 +217,7 @@ convert_temp_to_eng = {
 
 @handler_router.callback_query(F.data == 'call_but3_settings')
 async def call_but4(callback: CallbackQuery, state: FSMContext):
+    check_user_data(callback.from_user.id, callback.from_user.first_name)
     await state.clear()
     temptype = get_users_data(callback.from_user.id)['temptype']
     photo_temp_inp = InputMediaPhoto(media=photo_temp,
@@ -246,7 +246,9 @@ async def call_but5(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
 
 
-
+@handler_router.callback_query(F.data == 'pass')
+async def weather_forecast_current(callback: CallbackQuery):
+    await callback.answer('In development')
 
 #trash sms
 @handler_router.message()

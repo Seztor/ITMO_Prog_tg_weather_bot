@@ -21,13 +21,19 @@ back_but_to_0_plus_settings = InlineKeyboardMarkup(inline_keyboard=[[InlineKeybo
                                                                     [but_to_0]])
 
 
+
 #Прогноз погоды
+but_to_forecast = InlineKeyboardButton(text='Back ⤴', callback_data='call_back_to_forecast')
+back_but_to_forecast = InlineKeyboardMarkup(inline_keyboard=[[but_to_forecast]])
+
 but_forecast = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Current', callback_data='call_get_current_weather')],
     [InlineKeyboardButton(text='For 3 days', callback_data='pass')],
     [InlineKeyboardButton(text='For 2 weeks', callback_data='pass')],
     [InlineKeyboardButton(text='For a month', callback_data='pass')],
     [but_to_0]])
+
+
 
 
 #выбор ввода города

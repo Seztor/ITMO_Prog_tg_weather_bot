@@ -24,28 +24,52 @@ def get_city_by_coords(lat: str, lon: str):
 def get_cords_by_city(city_name: str):
     url = f'{BASE_URL_CITY}appid={TOKEN}&q={city_name}'
     response = requests.get(url).json()
-    print(response)
+    # print(response)
     try:
         cords = f'{round(response[0]['lat'],5)}:{round(response[0]['lon'],5)}'
         return cords
     except:
         return 'Error city'
 
-def get_current_weather_by_cords(lat: str, lon: str):
-    url = f'{BASE_URL_CURRENT_WEATHER_BY_CORDS}appid={TOKEN}&lat={lat}&lon={lon}'
+convert_temp_url = {
+    'cels': 'metric',
+    'far': 'imperial',
+    'kelv': 'standard'
+}
+
+def get_current_weather_by_cords(lat: str, lon: str, temptype: str):
+    url = f'{BASE_URL_CURRENT_WEATHER_BY_CORDS}appid={TOKEN}&lat={lat}&lon={lon}&units={convert_temp_url[temptype]}'
     try:
         response = requests.get(url).json()
         #print(response)
         w_coord_dict = response['coord']
         w_weather_dict = response['weather'][0]
-        w_main_dict = response['main']
+        w_wind_speed_type = {}
+        add_simv = ''
+        match temptype:
+            case "cels":
+                add_simv = '°C'
+                w_wind_speed_type = {'wind_speed_type': 'meter/sec'}
+            case "far":
+                add_simv = '℉'
+                w_wind_speed_type = {'wind_speed_type': 'miles/hour'}
+            case "kelv":
+                add_simv = 'K'
+                w_wind_speed_type = {'wind_speed_type': 'meter/sec'}
+
+        w_main_dict = dict(response['main'])
+        w_main_dict_keys = list(w_main_dict.keys())[:4]
+        for j in w_main_dict_keys:
+            w_main_dict[j] = f'{w_main_dict[j]} {add_simv}'
+        #print(w_main_dict)
+
         w_wind_dict = response['wind']
         w_clouds = response['clouds']
-        w_sunrise = f'{str(dt.datetime.fromtimestamp(int(response['sys']['sunrise']))).split()[1]} GMT+3'
-        w_sunset = f'{str(dt.datetime.fromtimestamp(int(response['sys']['sunset']))).split()[1]} GMT+3'
-        weather_data_arr = [w_weather_dict, w_main_dict, w_wind_dict, w_clouds, w_sunrise, w_sunset]
-        # return weather_data_arr
-        return weather_data_arr
+        w_sunrise = {'sunrise':f'{str(dt.datetime.fromtimestamp(int(response['sys']['sunrise']))).split()[1]} GMT+3'}
+        w_sunset = {'sunset':f'{str(dt.datetime.fromtimestamp(int(response['sys']['sunset']))).split()[1]} GMT+3'}
+        weather_data_dict = w_weather_dict | w_main_dict | w_wind_dict | w_wind_speed_type | w_clouds | w_sunrise | w_sunset
+        #print(weather_data_dict)
+        return weather_data_dict
     except:
         print('Error data')
 
