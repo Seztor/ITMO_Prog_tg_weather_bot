@@ -1,14 +1,9 @@
 {
     "id902097397": {
-        "name": "Павел",
-        "temptype": "cels",
-        "location": "Saint Petersburg",
-        "role": "admin"
-    },
-    "id520249743": {
-        "name": "Kirill",
-        "temptype": "cels",
-        "location": "None",
+        "name": "\u041f\u0430\u0432\u0435\u043b",
+        "temptype": "far",
+        "location": "\u0421\u0430\u043d\u043a\u0442-\u041f\u0435\u0442\u0435\u0440\u0431\u0443\u0440\u0433",
+        "cords": "59.93873:30.31623",
         "role": "admin"
     }
 }

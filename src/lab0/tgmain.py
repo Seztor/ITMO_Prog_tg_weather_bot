@@ -6,7 +6,7 @@ from src.lab0.app.handlers import handler_router
 
 
 async def main():
-    bot = Bot(token="8197013227:AAGGdLartz7O5E1cUFgHmUgPvA5UVU4jk3Y")
+    bot = Bot(token=open('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/tokens/TOKEN_BOT.txt').readline().strip())
     dp = Dispatcher()
     dp.include_router(handler_router)
     print('bot started')
@@ -14,8 +14,6 @@ async def main():
         await dp.start_polling(bot)
     except:
         print('finished')
-
-
 
 
 if __name__ == '__main__':
