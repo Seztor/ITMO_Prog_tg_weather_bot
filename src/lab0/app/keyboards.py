@@ -28,7 +28,7 @@ back_but_to_forecast = InlineKeyboardMarkup(inline_keyboard=[[but_to_forecast]])
 
 but_forecast = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Current', callback_data='call_get_current_weather')],
-    [InlineKeyboardButton(text='For 3 days', callback_data='pass')],
+    [InlineKeyboardButton(text='For 5 days', callback_data='call_get_few_days_weather')],
     [InlineKeyboardButton(text='For 2 weeks', callback_data='pass')],
     [InlineKeyboardButton(text='For a month', callback_data='pass')],
     [but_to_0]])

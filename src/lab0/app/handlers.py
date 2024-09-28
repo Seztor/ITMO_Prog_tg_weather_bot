@@ -6,9 +6,10 @@ from aiogram.fsm.context import FSMContext
 
 from src.lab0.base_data.data_disp import update_user_data, get_users_data, check_user_data
 import src.lab0.app.keyboards as kb
-from src.lab0.weather_data_api.weather_data_visualer import get_visual_data_current_weather
+from src.lab0.weather_data_api.weather_data_visualer import get_visual_data_current_weather, \
+    get_visual_data_few_days_weather
 from src.lab0.weather_data_api.weather_disp import (get_city_by_coords, get_current_weather_by_cords, get_cords_by_city,
-                                                    get_orig_city_name)
+                                                    get_orig_city_name, get_few_days_weather_by_cords)
 
 # from annotated_types.test_cases import cases
 
@@ -60,7 +61,7 @@ async def weather_forecast(callback: CallbackQuery, state: FSMContext):
     check_user_data(callback.from_user.id, callback.from_user.first_name)
     if get_users_data(callback.from_user.id)['location'] != 'None':
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
-                                         caption=f'Select weather forecast date::')
+                                         caption=f'Select weather forecast date:')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.but_forecast)
     else:
         await callback.answer('Please select a location to\nget the weather forecast', show_alert=True)
@@ -83,6 +84,26 @@ async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
         await callback.answer("Coordinates is not defined")
+
+
+#Прогноз на 5 дней
+@handler_router.callback_query(F.data == 'call_get_few_days_weather')
+async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
+        forecast_data_list = get_few_days_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
+                                                          get_users_data(callback.from_user.id)['temptype'])
+        # print(forecast_data_list)
+        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
+
+        str_forecast_output = get_visual_data_few_days_weather(forecast_data_list)
+        photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
+                                         caption=f'Forecast in "{get_users_data(callback.from_user.id)['location']}" '
+                                                 f'for 5 days:\n{str_forecast_output}')
+        await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
+    else:
+        await callback.answer("Coordinates is not defined")
+
 
 
 
@@ -194,11 +215,20 @@ async def type_cords(message: Message, state: FSMContext):
         #print('it is venue')
         await state.update_data(cords_data=message.venue)
         data = await state.get_data()
+        print(data)
         dict_data = dict(list(data['cords_data'])[0][1])
         lat, lon = dict_data['latitude'], dict_data['longitude']
         #print(lat, lon)
         update_user_data(get_city_by_coords(lat, lon), message.from_user.id, 'location')
         update_user_data(f'{round(float(lat),5)}:{round(float(lon),5)}', message.from_user.id, 'cords')
+        await message.delete()
+    elif str(message.content_type) == 'ContentType.LOCATION':
+        await state.update_data(cords_data=message.location)
+        data = await state.get_data()
+        dict_data = dict(data['cords_data'])
+        lat, lon = dict_data['latitude'], dict_data['longitude']
+        update_user_data(get_city_by_coords(lat, lon), message.from_user.id, 'location')
+        update_user_data(f'{round(float(lat), 5)}:{round(float(lon), 5)}', message.from_user.id, 'cords')
         await message.delete()
     else:
         await message.delete()
