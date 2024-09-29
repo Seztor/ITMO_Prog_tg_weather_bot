@@ -25,7 +25,6 @@ def update_user_data(data: str | dict, user_id: int, key: str | None = None):
         data_json[f'id{user_id}'] = data
     else:
         data_json[f'id{user_id}'][key] = data
-    #json.dump(data_json, f, indent=4, ensure_ascii=False, separators=(',', ': '))
     json.dump(data_json, f, indent=4, separators=(',', ': '))
     f.close()
 
@@ -47,5 +46,3 @@ def check_user_data(user_id : int, name: str):
             update_user_data(default_data, user_id)
     except:
         update_user_data(default_data, user_id)
-
-# update_user_data('دهستان چوپانان',902097397,'location')

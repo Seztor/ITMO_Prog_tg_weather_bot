@@ -1,4 +1,3 @@
-from urllib3.util.util import to_str
 
 
 def emoji_by_w_id(weather_id: int, icon: str):
@@ -54,7 +53,6 @@ def get_visual_data_current_weather(data: dict):
 #прогноз (на 5 дней)
 def get_visual_data_few_days_weather(data_list: list):
     str_data = '\n'
-    # print(len(data_list))
     first_date = True
     for dict_item in data_list:
         weather_condition_emoji = emoji_by_w_id(dict_item['id'], dict_item['icon'])
@@ -75,7 +73,6 @@ def get_visual_data_few_days_weather(data_list: list):
 
 def get_visual_data_two_weeks_weather(data_list: list):
     str_data = '\n'
-    # print(len(data_list))
     for i in range(len(data_list)):
         dict_item = data_list[i]
         weather_condition_emoji = emoji_by_w_id(dict_item['id'], dict_item['icon'])
@@ -91,7 +88,6 @@ def get_visual_data_two_weeks_weather(data_list: list):
 
 def get_visual_data_month_weather(data_list: list):
     str_data = '\n'
-    # print(len(data_list))
     for i in range(len(data_list)):
         dict_item = data_list[i]
         weather_condition_emoji = emoji_by_w_id(dict_item['id'], dict_item['icon'])

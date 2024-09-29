@@ -43,6 +43,3 @@ but_location = InlineKeyboardMarkup(inline_keyboard=[
 but_to_1 = InlineKeyboardButton(text='Back ⤴', callback_data='call_back_to_1')
 
 back_but_to_1 = InlineKeyboardMarkup(inline_keyboard=[[but_to_1]])
-
-# get_number = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Отправить номер',
-#                                                            request_contact=True)]],resize_keyboard=True)

@@ -77,7 +77,7 @@ async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
         forecast_data_dict = get_current_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
                                                           get_users_data(callback.from_user.id)['temptype'])
-        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
+
         current_location = get_users_data(callback.from_user.id)['location']
         if current_location == 'Error city':
             current_location = 'This coordinates place'
@@ -97,8 +97,7 @@ async def weather_forecast_few_days(callback: CallbackQuery, state: FSMContext):
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
         forecast_data_list = get_few_days_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
                                                           get_users_data(callback.from_user.id)['temptype'])
-        # print(forecast_data_list)
-        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
+
         current_location = get_users_data(callback.from_user.id)['location']
         if current_location == 'Error city':
             current_location = 'This coordinates place'
@@ -118,8 +117,7 @@ async def weather_forecast_two_weeks(callback: CallbackQuery, state: FSMContext)
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
         forecast_data_list = get_two_weeks_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
                                                           get_users_data(callback.from_user.id)['temptype'])
-        # print(forecast_data_list)
-        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
+
         current_location = get_users_data(callback.from_user.id)['location']
         if current_location == 'Error city':
             current_location = 'This coordinates place'
@@ -139,8 +137,6 @@ async def weather_forecast_month(callback: CallbackQuery, state: FSMContext):
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
         forecast_data_list = get_month_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
                                                           get_users_data(callback.from_user.id)['temptype'])
-        # print(forecast_data_list)
-        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
 
         str_forecast_output = get_visual_data_month_weather(forecast_data_list)
         current_location = get_users_data(callback.from_user.id)['location']
@@ -246,13 +242,11 @@ async def call_type_cords(callback: CallbackQuery, state: FSMContext):
 @handler_router.message(Weather.state_cords_pos)
 async def type_cords(message: Message, state: FSMContext):
     if str(message.content_type) == 'ContentType.TEXT':
-        #print('it is text')
         await state.update_data(cords_data=message.text)
         data = await state.get_data()
         try:
             lat, lon = map(float, data['cords_data'].strip().split(':'))
             if abs(lat) <= 90 and abs(lon) <= 180:
-                #print(get_city_by_coords(lat, lon))
                 update_user_data(get_city_by_coords(str(lat), str(lon)), message.from_user.id, 'location')
                 update_user_data(f'{round(lat,5)}:{round(lon,5)}', message.from_user.id, 'cords')
             else:
@@ -263,13 +257,11 @@ async def type_cords(message: Message, state: FSMContext):
             pass
         await message.delete()
     elif str(message.content_type) == 'ContentType.VENUE':
-        #print('it is venue')
         await state.update_data(cords_data=message.venue)
         data = await state.get_data()
         print(data)
         dict_data = dict(list(data['cords_data'])[0][1])
         lat, lon = dict_data['latitude'], dict_data['longitude']
-        #print(lat, lon)
         update_user_data(get_city_by_coords(lat, lon), message.from_user.id, 'location')
         update_user_data(f'{round(float(lat),5)}:{round(float(lon),5)}', message.from_user.id, 'cords')
         await message.delete()
@@ -350,32 +342,3 @@ async def trash(message: Message):
     check_user_data(message.from_user.id, message.from_user.first_name)
     await message.answer('I don’t understand, write /start to begin')
     await message.delete()
-
-# @handler_router.message(Command('reg'))
-# async def register(message: Message, state: FSMContext):
-#     await state.set_state(Register.name)
-#     await message.answer('Введите имя')
-#
-# @handler_router.message(Register.name)
-# async def register_name(message: Message, state: FSMContext):
-#     await state.update_data(name=message.text)
-#     await state.set_state(Register.age)
-#     await message.answer('Введите возраст')
-#
-# @handler_router.message(Register.age)
-# async def register_age(message: Message, state: FSMContext):
-#     await state.update_data(age=message.text)
-#     await state.set_state(Register.number)
-#     await message.answer('Введите число', reply_markup=kb.get_number)
-#
-# # @handler_router.message(Register.number, F.contact)
-# @handler_router.message(Register.number)
-# async def register_num(message: Message, state: FSMContext):
-#     if message.content_type == 'contact':
-#         await state.update_data(number=message.contact.phone_number)
-#         data = await state.get_data()
-#         await message.answer(f'Имя: {data['name']}\nВозраст: {data['age']}'
-#                              f'\nТел.: {data['number']}')
-#         await state.clear()
-#     else:
-#         await message.answer('Отправьте данные через кнопку')
