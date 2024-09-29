@@ -2,11 +2,11 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.state import State, StatesGroup
 from src.lab0.app.handlers import handler_router
-
+from src.lab0.tokens.tokens import get_bot_token
 
 
 async def main():
-    bot = Bot(token=open('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/tokens/TOKEN_BOT.txt').readline().strip())
+    bot = Bot(token=get_bot_token())
     dp = Dispatcher()
     dp.include_router(handler_router)
     print('bot started')

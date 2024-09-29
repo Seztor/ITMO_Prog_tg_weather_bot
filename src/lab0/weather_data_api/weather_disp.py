@@ -1,6 +1,8 @@
 import requests
 import datetime as dt
 
+from src.lab0.tokens.tokens import get_api_token
+
 #шаблоны url
 BASE_URL_CORDS = "http://pro.openweathermap.org/geo/1.0/reverse?"
 BASE_URL_CITY= "http://pro.openweathermap.org/geo/1.0/direct?"
@@ -9,7 +11,7 @@ BASE_URL_FEW_DAYS_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/fo
 BASE_URL_TWO_WEEKS_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/forecast/daily?"
 BASE_URL_MONTH_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/forecast/climate?"
 
-TOKEN = open('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/tokens/TOKEN_API.txt').readline().strip()
+TOKEN = get_api_token()
 
 
 def get_city_by_coords(lat: str, lon: str):
