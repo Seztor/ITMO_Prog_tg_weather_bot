@@ -1,6 +1,7 @@
 import json
+import os
 
-file_path = "C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/base_data/user_data.json"
+file_path = "base_data/user_data.json"
 
 
 #при наличии id возвращает данные по id, иначе все данные

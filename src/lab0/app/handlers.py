@@ -18,14 +18,14 @@ handler_router = Router()
 
 
 #подгрузка фото
-photo_about = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/about.jpg')
-photo_temp = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/temperature.png')
-photo_main = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/main_photo.png')
-photo_location = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/location.png')
-photo_city = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/city.png')
-photo_cords = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/cords.png')
-photo_forecast = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/forecast.png')
-photo_forecast2 = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/weather_forecast.png')
+photo_about = FSInputFile('media/about.jpg')
+photo_temp = FSInputFile('media/temperature.png')
+photo_main = FSInputFile('media/main_photo.png')
+photo_location = FSInputFile('media/location.png')
+photo_city = FSInputFile('media/city.png')
+photo_cords = FSInputFile('media/cords.png')
+photo_forecast = FSInputFile('media/forecast.png')
+photo_forecast2 = FSInputFile('media/weather_forecast.png')
 
 
 #класс состояний
