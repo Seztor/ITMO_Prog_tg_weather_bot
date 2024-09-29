@@ -32,6 +32,4 @@ class CalculatorTestCase(unittest.TestCase):
     def get_emoji_by_w_id(self):
         self.assertEqual(emoji_by_w_id(800,'01d'),'☀️')
 
-    def get_emoji_by_w_id2(self):
-        self.assertEqual(emoji_by_w_id(800,'01d'),'☀️')
 

@@ -37,7 +37,7 @@ def get_visual_data_current_weather(data: dict):
     date_arr = str(data['dt']).split()
     normal_date = '.'.join(reversed(date_arr[0].split('-')))
     visual_arr = ['weather condition','temp','feels like','pressure','humidity','wind speed','wind degree','cloudiness','sunrise','sunset']
-    add_simv_arr = ['',f' {data['add_simv']}',f' {data['add_simv']}',' hPa', ' %', f' {data['wind_speed_type']}','°',' %','','']
+    add_simv_arr = ['',f" {data['add_simv']}",f" {data['add_simv']}",' hPa', ' %', f" {data['wind_speed_type']}",'°',' %','','']
     weather_condition_emoji = emoji_by_w_id(data['id'], data['icon'])
     add_emoji_arr = [weather_condition_emoji, '🌡️', '🌞', '♎', '💧', '💨', '🧭', '☁️','🌅','🌄']
 
