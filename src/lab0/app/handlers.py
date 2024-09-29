@@ -78,10 +78,12 @@ async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
         forecast_data_dict = get_current_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
                                                           get_users_data(callback.from_user.id)['temptype'])
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
-
+        current_location = get_users_data(callback.from_user.id)['location']
+        if current_location == 'Error city':
+            current_location = 'This coordinates place'
         str_forecast_output, now_date = get_visual_data_current_weather(forecast_data_dict)
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
-                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                         caption=f'Forecast in <b>"{current_location}"</b> '
                                                  f'for today ({now_date}):\n{str_forecast_output} ', parse_mode='HTML')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
@@ -97,10 +99,12 @@ async def weather_forecast_few_days(callback: CallbackQuery, state: FSMContext):
                                                           get_users_data(callback.from_user.id)['temptype'])
         # print(forecast_data_list)
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
-
+        current_location = get_users_data(callback.from_user.id)['location']
+        if current_location == 'Error city':
+            current_location = 'This coordinates place'
         str_forecast_output = get_visual_data_few_days_weather(forecast_data_list)
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
-                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                         caption=f'Forecast in <b>"{current_location}"</b> '
                                                  f'for 5 days:\n{str_forecast_output}', parse_mode='HTML')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
@@ -116,10 +120,12 @@ async def weather_forecast_two_weeks(callback: CallbackQuery, state: FSMContext)
                                                           get_users_data(callback.from_user.id)['temptype'])
         # print(forecast_data_list)
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
-
+        current_location = get_users_data(callback.from_user.id)['location']
+        if current_location == 'Error city':
+            current_location = 'This coordinates place'
         str_forecast_output = get_visual_data_two_weeks_weather(forecast_data_list)
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
-                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                         caption=f'Forecast in <b>"{current_location}"</b> '
                                                  f'for 2 weeks:\n{str_forecast_output}', parse_mode='HTML')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
@@ -137,8 +143,11 @@ async def weather_forecast_month(callback: CallbackQuery, state: FSMContext):
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
 
         str_forecast_output = get_visual_data_month_weather(forecast_data_list)
+        current_location = get_users_data(callback.from_user.id)['location']
+        if current_location == 'Error city':
+            current_location = 'This coordinates place'
         photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
-                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                         caption=f'Forecast in <b>"{current_location}"</b> '
                                                  f'for month:\n{str_forecast_output}', parse_mode='HTML')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
@@ -244,8 +253,12 @@ async def type_cords(message: Message, state: FSMContext):
             lat, lon = map(float, data['cords_data'].strip().split(':'))
             if abs(lat) <= 90 and abs(lon) <= 180:
                 #print(get_city_by_coords(lat, lon))
-                update_user_data(get_city_by_coords(lat, lon), message.from_user.id, 'location')
+                update_user_data(get_city_by_coords(str(lat), str(lon)), message.from_user.id, 'location')
                 update_user_data(f'{round(lat,5)}:{round(lon,5)}', message.from_user.id, 'cords')
+            else:
+                update_user_data('Error city', message.from_user.id, 'location')
+                update_user_data('Error cords', message.from_user.id, 'cords')
+
         except:
             pass
         await message.delete()
