@@ -6,6 +6,8 @@ BASE_URL_CORDS = "http://pro.openweathermap.org/geo/1.0/reverse?"
 BASE_URL_CITY= "http://pro.openweathermap.org/geo/1.0/direct?"
 BASE_URL_CURRENT_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/weather?"
 BASE_URL_FEW_DAYS_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/forecast?"
+BASE_URL_TWO_WEEKS_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/forecast/daily?"
+BASE_URL_MONTH_WEATHER_BY_CORDS = "https://pro.openweathermap.org/data/2.5/forecast/climate?"
 
 TOKEN = open('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/tokens/TOKEN_API.txt').readline().strip()
 
@@ -63,7 +65,6 @@ def get_current_weather_by_cords(lat: str, lon: str, temptype: str):
     url = f'{BASE_URL_CURRENT_WEATHER_BY_CORDS}appid={TOKEN}&lat={lat}&lon={lon}&units={convert_temp_url[temptype]}'
     try:
         response = requests.get(url).json()
-        #print(response)
         #w_coord_dict = response['coord']
         w_weather_dict = response['weather'][0]
 
@@ -74,7 +75,8 @@ def get_current_weather_by_cords(lat: str, lon: str, temptype: str):
         w_clouds = response['clouds']
         w_sunrise = {'sunrise':f'{str(dt.datetime.fromtimestamp(int(response['sys']['sunrise']))).split()[1]} GMT+3'}
         w_sunset = {'sunset':f'{str(dt.datetime.fromtimestamp(int(response['sys']['sunset']))).split()[1]} GMT+3'}
-        weather_data_dict = w_weather_dict | w_main_dict | w_add_symbols | w_wind_dict  | w_clouds | w_sunrise | w_sunset
+        w_time = {'dt': f'{str(dt.datetime.fromtimestamp(response['dt']))[5:-3]} GMT+3'}
+        weather_data_dict = w_weather_dict | w_main_dict | w_add_symbols | w_wind_dict  | w_clouds | w_sunrise | w_sunset | w_time
         #print(weather_data_dict)
         return weather_data_dict
     except:
@@ -100,4 +102,43 @@ def get_few_days_weather_by_cords(lat: str, lon: str, temptype: str):
         print('Error data')
 
 
-get_few_days_weather_by_cords('55.164440','61.436844', 'cels')
+def get_two_weeks_weather_by_cords(lat: str, lon: str, temptype: str):
+    url = f'{BASE_URL_TWO_WEEKS_WEATHER_BY_CORDS}appid={TOKEN}&lat={lat}&lon={lon}&units={convert_temp_url[temptype]}&cnt=14'
+    try:
+        response = requests.get(url).json()
+        weather_data_list = []
+        for dict_item in response['list']:
+            w_weather_dict = dict_item['weather'][0]
+            w_add_symbols = get_add_symb_by_temptype(temptype)
+            w_main_dict = dict_item['temp']
+            w_wind_speed = {'wind_speed':dict_item['speed']}
+            w_time = {'dt': f'{str(dt.datetime.fromtimestamp(dict_item['dt']))[5:-3]} GMT+3'}
+            weather_data_list.append(w_weather_dict | w_add_symbols | w_main_dict | w_time | w_wind_speed)
+        # for i in weather_data_list:
+        #     print(i)
+        #     print('#############################################')
+        return weather_data_list
+    except:
+        print('Error data')
+
+
+def get_month_weather_by_cords(lat: str, lon: str, temptype: str):
+    url = f'{BASE_URL_MONTH_WEATHER_BY_CORDS}appid={TOKEN}&lat={lat}&lon={lon}&units={convert_temp_url[temptype]}&cnt=30'
+    try:
+        response = requests.get(url).json()
+        weather_data_list = []
+        for dict_item in response['list']:
+            w_weather_dict = dict_item['weather'][0]
+            w_add_symbols = get_add_symb_by_temptype(temptype)
+            w_main_dict = dict_item['temp']
+            w_time = {'dt': f'{str(dt.datetime.fromtimestamp(dict_item['dt']))[5:-3]} GMT+3'}
+            weather_data_list.append(w_weather_dict | w_add_symbols | w_main_dict | w_time)
+        # for i in weather_data_list:
+        #     print(i)
+        #     print('#############################################')
+        return weather_data_list
+    except:
+        print('Error data')
+#get_few_days_weather_by_cords('55.164440','61.436844', 'cels')
+
+get_month_weather_by_cords('55.164440','61.436844', 'cels')

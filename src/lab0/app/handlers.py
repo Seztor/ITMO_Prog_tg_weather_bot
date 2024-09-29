@@ -7,9 +7,10 @@ from aiogram.fsm.context import FSMContext
 from src.lab0.base_data.data_disp import update_user_data, get_users_data, check_user_data
 import src.lab0.app.keyboards as kb
 from src.lab0.weather_data_api.weather_data_visualer import get_visual_data_current_weather, \
-    get_visual_data_few_days_weather
+    get_visual_data_few_days_weather, get_visual_data_two_weeks_weather, get_visual_data_month_weather
 from src.lab0.weather_data_api.weather_disp import (get_city_by_coords, get_current_weather_by_cords, get_cords_by_city,
-                                                    get_orig_city_name, get_few_days_weather_by_cords)
+                                                    get_orig_city_name, get_few_days_weather_by_cords,
+                                                    get_two_weeks_weather_by_cords, get_month_weather_by_cords)
 
 # from annotated_types.test_cases import cases
 
@@ -24,6 +25,7 @@ photo_location = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/med
 photo_city = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/city.png')
 photo_cords = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/cords.png')
 photo_forecast = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/forecast.png')
+photo_forecast2 = FSInputFile('C:/Users/pavel/PycharmProjects/tg_bot/src/lab0/media/weather_forecast.png')
 
 
 #класс состояний
@@ -37,9 +39,9 @@ class Weather(StatesGroup):
 async def main_menu(message: Message, state: FSMContext):
     await state.clear()
     check_user_data(message.from_user.id, message.from_user.first_name)
-    await message.answer_photo(photo_main ,caption=f'🌏 Hello {message.from_user.first_name},'
+    await message.answer_photo(photo_main ,caption=f'🌏 Hello <b>{message.from_user.first_name}</b>,'
                                                    f' this is a weather forecast bot!\n📝 Select menu item:',
-                               reply_markup=kb.main)
+                               reply_markup=kb.main, parse_mode='HTML')
 
 
 @handler_router.callback_query(F.data == 'call_back_to_0')
@@ -47,8 +49,8 @@ async def main_menu(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     check_user_data(callback.from_user.id, callback.from_user.first_name)
     photo_main_inp = InputMediaPhoto(media=photo_main,
-                                     caption=f'🌏 Hello {callback.from_user.first_name},'
-                                             f' this is a weather forecast bot!\n📝 Select menu item:')
+                                     caption=f'🌏 Hello <b>{callback.from_user.first_name}</b>,'
+                                             f' this is a weather forecast bot!\n📝 Select menu item:', parse_mode='HTML')
     await callback.message.edit_media(photo_main_inp, reply_markup=kb.main)
 
 
@@ -77,10 +79,10 @@ async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
                                                           get_users_data(callback.from_user.id)['temptype'])
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
 
-        str_forecast_output = get_visual_data_current_weather(forecast_data_dict)
-        photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
-                                         caption=f'Forecast in "{get_users_data(callback.from_user.id)['location']}" '
-                                                 f'for today:\n{str_forecast_output}')
+        str_forecast_output, now_date = get_visual_data_current_weather(forecast_data_dict)
+        photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
+                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                                 f'for today ({now_date}):\n{str_forecast_output} ', parse_mode='HTML')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
         await callback.answer("Coordinates is not defined")
@@ -88,7 +90,7 @@ async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
 
 #Прогноз на 5 дней
 @handler_router.callback_query(F.data == 'call_get_few_days_weather')
-async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
+async def weather_forecast_few_days(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
         forecast_data_list = get_few_days_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
@@ -97,15 +99,50 @@ async def weather_forecast_current(callback: CallbackQuery, state: FSMContext):
         #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
 
         str_forecast_output = get_visual_data_few_days_weather(forecast_data_list)
-        photo_forecast_inp = InputMediaPhoto(media=photo_forecast,
-                                         caption=f'Forecast in "{get_users_data(callback.from_user.id)['location']}" '
-                                                 f'for 5 days:\n{str_forecast_output}')
+        photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
+                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                                 f'for 5 days:\n{str_forecast_output}', parse_mode='HTML')
         await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
     else:
         await callback.answer("Coordinates is not defined")
 
 
+#Прогноз на 2 недели
+@handler_router.callback_query(F.data == 'call_get_two_weeks_weather')
+async def weather_forecast_two_weeks(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
+        forecast_data_list = get_two_weeks_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
+                                                          get_users_data(callback.from_user.id)['temptype'])
+        # print(forecast_data_list)
+        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
 
+        str_forecast_output = get_visual_data_two_weeks_weather(forecast_data_list)
+        photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
+                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                                 f'for 2 weeks:\n{str_forecast_output}', parse_mode='HTML')
+        await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
+    else:
+        await callback.answer("Coordinates is not defined")
+
+
+#Прогноз на месяц
+@handler_router.callback_query(F.data == 'call_get_month_weather')
+async def weather_forecast_month(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    if get_users_data(callback.from_user.id)['cords'] != 'Error cords':
+        forecast_data_list = get_month_weather_by_cords(*get_users_data(callback.from_user.id)['cords'].split(':'),
+                                                          get_users_data(callback.from_user.id)['temptype'])
+        # print(forecast_data_list)
+        #print(type(forecast_data_arr[0]),forecast_data_arr, 'forecast_data_arr')
+
+        str_forecast_output = get_visual_data_month_weather(forecast_data_list)
+        photo_forecast_inp = InputMediaPhoto(media=photo_forecast2,
+                                         caption=f'Forecast in <b>"{get_users_data(callback.from_user.id)['location']}"</b> '
+                                                 f'for month:\n{str_forecast_output}', parse_mode='HTML')
+        await callback.message.edit_media(photo_forecast_inp, reply_markup=kb.back_but_to_forecast)
+    else:
+        await callback.answer("Coordinates is not defined")
 
 
 #установка роли
@@ -147,9 +184,9 @@ async def call_but2(callback: CallbackQuery, state: FSMContext):
         current_cords = 'not defined'
     if current_cords == 'Error cords':
         current_cords = 'coordinates not found'
-    photo_location_inp = InputMediaPhoto(media=photo_location, caption=f'Current location: {current_location}\n'
-                                                                       f'Current coordinates: {current_cords}\n'
-                                                                       f'Select location method:')
+    photo_location_inp = InputMediaPhoto(media=photo_location, caption=f'Current location: <b>{current_location}</b>\n'
+                                                                       f'Current coordinates: <b>{current_cords.replace(':',' : ')}</b>\n'
+                                                                       f'Select location method:', parse_mode='HTML')
     await callback.message.edit_media(photo_location_inp, reply_markup=kb.but_location)
 
 
@@ -160,8 +197,8 @@ async def call_but2(callback: CallbackQuery, state: FSMContext):
 async def call_type_city(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Weather.state_get_city)
     check_user_data(callback.from_user.id, callback.from_user.first_name)
-    photo_city_inp = InputMediaPhoto(media=photo_city, caption=f'Enter the name of the locality\n'
-                                                               f'point, and then go back:')
+    photo_city_inp = InputMediaPhoto(media=photo_city, caption=f'Enter the name of the <b>locality\n'
+                                                               f'point</b>, and then go back:', parse_mode='HTML')
     await callback.message.edit_media(photo_city_inp, reply_markup=kb.back_but_to_1)
 
 
@@ -191,9 +228,9 @@ async def type_city(message: Message, state: FSMContext):
 async def call_type_cords(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Weather.state_cords_pos)
     check_user_data(callback.from_user.id, callback.from_user.first_name)
-    photo_cords_inp = InputMediaPhoto(media=photo_cords, caption=f'Enter coordinates in "latitude:longitude"\n'
-                                                                 f'format or submit a geolocation\n'
-                                                                 f'and then return back')
+    photo_cords_inp = InputMediaPhoto(media=photo_cords, caption=f'Enter coordinates in "<b>latitude</b>:<b>longitude</b>"\n'
+                                                                 f'format or <b>submit a geolocation</b>\n'
+                                                                 f'and then <b>return back</b>', parse_mode='HTML')
     await callback.message.edit_media(photo_cords_inp, reply_markup=kb.back_but_to_1)
 
 
@@ -242,9 +279,10 @@ async def call_but3(callback: CallbackQuery, state: FSMContext):
     check_user_data(callback.from_user.id, callback.from_user.first_name)
     await state.clear()
     photo_about_inp = InputMediaPhoto(media=photo_about,
-                                      caption='Weather bot\n'
+                                      caption='<b>Weather bot</b>\n'
                                               'Creared by @Seztor\n'
-                                              'Pavel Govorov')
+                                              'Pavel Govorov\n'
+                                              '<tg-spoiler>Your advertisement could be here :)</tg-spoiler>',parse_mode="HTML")
     await callback.message.edit_media(photo_about_inp, reply_markup=kb.back_but_to_0)
 
 
@@ -264,7 +302,7 @@ async def call_but4(callback: CallbackQuery, state: FSMContext):
     temptype = get_users_data(callback.from_user.id)['temptype']
     photo_temp_inp = InputMediaPhoto(media=photo_temp,
                                      caption=f'🌡️ Choose what to measure your temperature in\n'
-                                             f'Now the temperature scale: {convert_temp_to_eng[temptype]}')
+                                             f'Now the temperature scale: <b>{convert_temp_to_eng[temptype]}</b>', parse_mode='HTML')
 
     await callback.message.edit_media(photo_temp_inp, reply_markup=kb.back_but_to_0_plus_settings)
 
@@ -281,7 +319,7 @@ async def call_but5(callback: CallbackQuery, state: FSMContext):
         photo_temp_inp = InputMediaPhoto(
             media=photo_temp,
             caption=f'🌡️ Choose what to measure your temperature in\n'
-                    f'Now the temperature scale: {convert_temp_to_eng[data]}')
+                    f'Now the temperature scale: <b>{convert_temp_to_eng[data]}</b>', parse_mode='HTML')
         await callback.message.edit_media(photo_temp_inp, reply_markup=kb.back_but_to_0_plus_settings)
 
     except:
@@ -296,7 +334,8 @@ async def weather_forecast_current(callback: CallbackQuery):
 @handler_router.message()
 async def trash(message: Message):
     check_user_data(message.from_user.id, message.from_user.first_name)
-    await message.reply('I don’t understand, write /start to begin')
+    await message.answer('I don’t understand, write /start to begin')
+    await message.delete()
 
 # @handler_router.message(Command('reg'))
 # async def register(message: Message, state: FSMContext):
