@@ -1,9 +1,16 @@
 {
     "id902097397": {
         "name": "\u041f\u0430\u0432\u0435\u043b",
-        "temptype": "cels",
-        "location": "Error city",
-        "cords": "1.0:1.0",
+        "temptype": "kelv",
+        "location": "Vladivostok",
+        "cords": "43.11507:131.88558",
         "role": "admin"
+    },
+    "id812196156": {
+        "name": "\u042f\u0440\u043e\u0441\u043b\u0430\u0432",
+        "temptype": "cels",
+        "location": "Chelyabinsk",
+        "cords": "55.15984:61.40255",
+        "role": "user"
     }
 }
