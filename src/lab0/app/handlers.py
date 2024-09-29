@@ -241,10 +241,11 @@ async def type_cords(message: Message, state: FSMContext):
         await state.update_data(cords_data=message.text)
         data = await state.get_data()
         try:
-            lat, lon = data['cords_data'].strip().split(':')
-            #print(get_city_by_coords(lat, lon))
-            update_user_data(get_city_by_coords(lat, lon), message.from_user.id, 'location')
-            update_user_data(f'{round(float(lat),5)}:{round(float(lon),5)}', message.from_user.id, 'cords')
+            lat, lon = map(float, data['cords_data'].strip().split(':'))
+            if abs(lat) <= 90 and abs(lon) <= 180:
+                #print(get_city_by_coords(lat, lon))
+                update_user_data(get_city_by_coords(lat, lon), message.from_user.id, 'location')
+                update_user_data(f'{round(lat,5)}:{round(lon,5)}', message.from_user.id, 'cords')
         except:
             pass
         await message.delete()
