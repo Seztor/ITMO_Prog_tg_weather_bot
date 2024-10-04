@@ -1,6 +1,5 @@
-import requests
 import datetime as dt
-
+import requests
 from src.lab0.tokens.tokens import get_api_token
 
 #шаблоны url
@@ -79,6 +78,7 @@ def get_current_weather_by_cords(lat: str, lon: str, temptype: str):
         return weather_data_dict
     except:
         print('Error data')
+        return
 
 def get_few_days_weather_by_cords(lat: str, lon: str, temptype: str):
     url = f"{BASE_URL_FEW_DAYS_WEATHER_BY_CORDS}appid={TOKEN}&lat={lat}&lon={lon}&units={convert_temp_url[temptype]}"
@@ -95,6 +95,7 @@ def get_few_days_weather_by_cords(lat: str, lon: str, temptype: str):
         return weather_data_list
     except:
         print('Error data')
+        return
 
 
 def get_two_weeks_weather_by_cords(lat: str, lon: str, temptype: str):
@@ -112,6 +113,7 @@ def get_two_weeks_weather_by_cords(lat: str, lon: str, temptype: str):
         return weather_data_list
     except:
         print('Error data')
+        return
 
 
 def get_month_weather_by_cords(lat: str, lon: str, temptype: str):
@@ -128,3 +130,4 @@ def get_month_weather_by_cords(lat: str, lon: str, temptype: str):
         return weather_data_list
     except:
         print('Error data')
+        return
